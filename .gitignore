@@ -14,6 +14,8 @@ target/
 *.class
 
 *.properties
+*.mvn
+*.cmd
 
 # Log file
 *.log
