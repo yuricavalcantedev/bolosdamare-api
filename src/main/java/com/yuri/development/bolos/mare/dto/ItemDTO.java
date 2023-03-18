@@ -1,4 +1,4 @@
-package com.yuri.development.bolos.mare;
+package com.yuri.development.bolos.mare.dto;
 
 import com.yuri.development.bolos.mare.enums.ESupplyType;
 import jakarta.validation.constraints.NotNull;
@@ -14,11 +14,16 @@ public class ItemDTO {
     @NotNull
     private String name;
 
-    private String description;
     private String hexColor;
 
     @NotNull
+    private Integer priority;
+
+    @NotNull
     private Integer quantity;
+
+    @NotNull
+    private Double price;
 
     @NotNull
     private ESupplyType supplyType;

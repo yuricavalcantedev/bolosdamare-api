@@ -8,13 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Entity
-@Table(name = "supply")
+@Table(name = "item")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+//TODO maybe I should create another Item class(ItemInProduct), a composition one, to put inside Product
 public class Item {
 
     @Id
@@ -25,17 +24,18 @@ public class Item {
     @NotBlank(message = "name can't be empty or null")
     private String name;
 
-    private String description;
-
-    private String hexColor;
+    @NotNull
+    private Integer priority;
 
     @NotNull
     private Integer quantity;
 
+    @NotNull
+    private Double price;
+
+    private String hexColor;
+
     @Enumerated(EnumType.STRING)
     private ESupplyType supplyType;
-
-    @ManyToMany(mappedBy = "itemList")
-    private List<Product> productList;
 
 }

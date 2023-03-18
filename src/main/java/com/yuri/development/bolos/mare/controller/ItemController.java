@@ -1,7 +1,6 @@
 package com.yuri.development.bolos.mare.controller;
 
-import com.yuri.development.bolos.mare.ItemDTO;
-import com.yuri.development.bolos.mare.model.Item;
+import com.yuri.development.bolos.mare.dto.ItemDTO;
 import com.yuri.development.bolos.mare.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,13 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody ItemDTO itemDTO){
-
         return itemService.create(itemDTO);
     }
 
-    @PutMapping
-    public ResponseEntity<?>update(@RequestBody Item item){
-        return itemService.update();
+    @PutMapping("/{id}")
+    @CrossOrigin(origins = {"http://localhost:4200"})
+    public ResponseEntity<?>update(@PathVariable Long id, @RequestBody ItemDTO itemDTO){
+        return itemService.update(id, itemDTO);
     }
 
     @GetMapping
@@ -34,7 +33,8 @@ public class ItemController {
         return itemService.findAll();
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
+    @CrossOrigin(origins = {"http://localhost:4200"})
     public void delete(@PathVariable Long id) {
         itemService.delete(id);
     }
