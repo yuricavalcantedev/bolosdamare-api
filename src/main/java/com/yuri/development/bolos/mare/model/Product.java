@@ -1,12 +1,15 @@
 package com.yuri.development.bolos.mare.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -14,6 +17,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Product {
 
     @Id
@@ -24,10 +30,13 @@ public class Product {
     @NotBlank(message = "name can't be empty or null")
     private String name;
 
-    private String description;
+    @NotNull
+    private BigDecimal price;
 
-    @ManyToMany(mappedBy = "productList")
-    private List<Order> orderList;
+    @OneToMany(mappedBy="product", cascade = CascadeType.ALL)
+    private List<ItemInProduct> itemInProductList;
 
-    private Double price;
+    @ManyToOne
+    @JoinColumn(name="order_id")
+    private Order order;
 }

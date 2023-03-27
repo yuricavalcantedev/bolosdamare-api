@@ -14,7 +14,7 @@ import java.util.Optional;
 @Service
 public class ItemService {
 
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
     @Autowired
     public ItemService(ItemRepository itemRepository){
@@ -36,15 +36,19 @@ public class ItemService {
 
     public ResponseEntity<?> update(Long itemId, ItemDTO itemDTO){
 
-        Optional<Item> optItem = itemRepository.findByName(itemDTO.getName());
+        Optional<Item> optItem = itemRepository.findById(itemDTO.getId());
         if(optItem.isEmpty()){
-            return new ResponseEntity<>(ErrorConstants.RESOURCE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(ErrorConstants.RESOURCE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
         Item item = adaptItemDTOToItem(itemDTO);
         item.setId(itemId);
         item = itemRepository.save(item);
         return new ResponseEntity<>(item, HttpStatus.OK);
+    }
+
+    public Optional<Item> findById(Long id){
+        return itemRepository.findById(id);
     }
 
     public ResponseEntity<?> findAll(){
@@ -68,7 +72,6 @@ public class ItemService {
         item.setName(itemDTO.getName());
         item.setHexColor(itemDTO.getHexColor());
         item.setPrice(itemDTO.getPrice());
-        item.setPriority(itemDTO.getPriority());
         item.setQuantity(itemDTO.getQuantity());
         item.setSupplyType(itemDTO.getSupplyType());
 

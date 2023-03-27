@@ -1,5 +1,7 @@
 package com.yuri.development.bolos.mare.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +12,13 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 @Entity
-@Table(name = "orderTable")
+@Table(name = "orders")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Order {
 
     @Id
@@ -25,11 +30,7 @@ public class Order {
 
     private LocalDateTime updatedDate;
 
-    @ManyToMany
-    @JoinTable(
-            name = "product",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    @OneToMany(mappedBy="order")
     private List<Product> productList;
 
     private Double price;
