@@ -24,6 +24,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @CrossOrigin(origins = {"http://localhost:4200"})
     public ResponseEntity<?>update(@Valid @PathVariable("id") Long id, @RequestBody ProductCreateDTO productCreateDTO){
         return productService.update(id, productCreateDTO);
     }

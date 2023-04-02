@@ -7,7 +7,7 @@ public enum ESupplyType {
 
     private String description;
 
-    private ESupplyType(String description){
+    ESupplyType(String description){
         this.description = description;
     }
 }

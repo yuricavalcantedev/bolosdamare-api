@@ -1,7 +1,5 @@
 package com.yuri.development.bolos.mare.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.yuri.development.bolos.mare.enums.ESupplyType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -11,13 +9,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
-@Table(name = "item")
+@Table(name = "items")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Item {
 
     @Id
@@ -38,5 +36,8 @@ public class Item {
 
     @Enumerated(EnumType.STRING)
     private ESupplyType supplyType;
+
+    @ManyToMany(mappedBy = "itemsList", fetch = FetchType.LAZY)
+    private List<Product> productList;
 
 }

@@ -1,5 +1,6 @@
 package com.yuri.development.bolos.mare.dto;
 
+import com.yuri.development.bolos.mare.model.Item;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,11 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductCreateDTO {
 
+    private Long id;
+
     @NotNull
     private String name;
 
     @NotNull
     private BigDecimal price;
 
-    private List<ItemInProductCreateDTO> itemInProductList;
+    private List<Item> itemsList;
 }

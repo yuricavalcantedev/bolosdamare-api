@@ -1,7 +1,6 @@
 package com.yuri.development.bolos.mare.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,13 +12,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "items"})
 public class Product {
 
     @Id
@@ -33,10 +30,12 @@ public class Product {
     @NotNull
     private BigDecimal price;
 
-    @OneToMany(mappedBy="product", cascade = CascadeType.ALL)
-    private List<ItemInProduct> itemInProductList;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "products_items",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id"))
+    private List<Item> itemsList;
 
-    @ManyToOne
-    @JoinColumn(name="order_id")
-    private Order order;
+    @ManyToMany(mappedBy = "productsList", fetch = FetchType.LAZY)
+    private List<Order> orderList;
 }

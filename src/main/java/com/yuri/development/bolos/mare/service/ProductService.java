@@ -1,10 +1,7 @@
 package com.yuri.development.bolos.mare.service;
 
-import com.yuri.development.bolos.mare.dto.ItemInProductDTO;
 import com.yuri.development.bolos.mare.dto.ProductCreateDTO;
 import com.yuri.development.bolos.mare.dto.ProductDTO;
-import com.yuri.development.bolos.mare.model.Item;
-import com.yuri.development.bolos.mare.model.ItemInProduct;
 import com.yuri.development.bolos.mare.model.Product;
 import com.yuri.development.bolos.mare.repository.ProductRepository;
 import com.yuri.development.bolos.mare.util.ErrorConstants;
@@ -24,15 +21,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    private final ItemInProductService itemInProductService;
-
-    private final ItemService itemService;
-
     @Autowired
-    public ProductService(ProductRepository productRepository, ItemInProductService itemInProductService, ItemService itemService) {
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.itemInProductService = itemInProductService;
-        this.itemService = itemService;
     }
 
     public ResponseEntity<?> save(ProductCreateDTO productDTO) {
@@ -42,12 +33,11 @@ public class ProductService {
             return new ResponseEntity<>(ErrorConstants.PRODUCT_ALREADY_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
-        Product product = adaptToProduct(productDTO);
-        List<ItemInProduct> itemInProductList = product.getItemInProductList();
-        product.setItemInProductList(null);
+        Product product = new Product();
+        adaptToProduct(product, productDTO);
+
         product = productRepository.save(product);
 
-        product.setItemInProductList(itemInProductService.saveAll(product, itemInProductList));
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
@@ -59,13 +49,8 @@ public class ProductService {
             return new ResponseEntity<>(ErrorConstants.RESOURCE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        List<ItemInProduct> itemInProductList = productCreateDTO.getItemInProductList().stream()
-                .map(itemDto -> new ItemInProduct(itemDto.getItemId(), itemDto.getQuantity(), itemDto.getPrice()))
-                .collect(Collectors.toList());
-
-        itemInProductService.deleteByProduct(optProduct.get());
+        adaptToProduct(optProduct.get(), productCreateDTO);
         productRepository.save(optProduct.get());
-        optProduct.get().setItemInProductList(itemInProductService.saveAll(optProduct.get(), itemInProductList));
 
         return new ResponseEntity<>(optProduct.get(), HttpStatus.OK);
     }
@@ -75,13 +60,8 @@ public class ProductService {
         List<Product> productList = productRepository.findAll();
         List<ProductDTO> productDTOList = new ArrayList<>();
 
-        for(Product product : productList){
-            List<ItemInProductDTO> itemInProductDTOList = product.getItemInProductList().stream()
-                    .map(item -> adaptItemInProductToDTO(item)).collect(Collectors.toList());
-
-            productDTOList.add(adaptProductToDTO(product, itemInProductDTOList));
-        }
-
+        productDTOList = productList.stream()
+                .map(this::adaptProductToDTO).collect(Collectors.toList());
         return new ResponseEntity<>(productDTOList, HttpStatus.OK);
     }
 
@@ -96,42 +76,22 @@ public class ProductService {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private Product adaptToProduct(ProductCreateDTO dto) {
+    private void adaptToProduct(Product product, ProductCreateDTO dto) {
 
-        Product product = new Product();
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
+        product.setItemsList(dto.getItemsList());
 
-        List<ItemInProduct> itemInProductList = dto.getItemInProductList().stream()
-                .map(itemDto -> new ItemInProduct(itemDto.getItemId(), itemDto.getQuantity(), itemDto.getPrice()))
-                .collect(Collectors.toList());
-
-        product.setItemInProductList(itemInProductList);
-        return product;
     }
 
-    private ProductDTO adaptProductToDTO(Product product, List<ItemInProductDTO> itemInProductDTOList){
+    private ProductDTO adaptProductToDTO(Product product){
 
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(product.getId());
         productDTO.setName(product.getName());
         productDTO.setPrice(product.getPrice());
-        productDTO.setItemInProductDTOList(itemInProductDTOList);
+        productDTO.setItems(product.getItemsList());
 
         return  productDTO;
     }
-
-    private ItemInProductDTO adaptItemInProductToDTO(ItemInProduct itemInProduct){
-
-        ItemInProductDTO itemInProductDTO = new ItemInProductDTO();
-        itemInProductDTO.setId(itemInProduct.getId());
-        itemInProductDTO.setPrice(itemInProduct.getPrice());
-        itemInProductDTO.setQuantity(itemInProduct.getQuantity());
-
-        Optional<Item> optItem = itemService.findById(itemInProduct.getItemId());
-        optItem.ifPresent(itemInProductDTO::setItem);
-
-        return itemInProductDTO;
-    }
-
 }
