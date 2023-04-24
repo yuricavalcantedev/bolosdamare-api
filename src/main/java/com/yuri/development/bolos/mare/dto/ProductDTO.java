@@ -1,6 +1,6 @@
 package com.yuri.development.bolos.mare.dto;
 
-import com.yuri.development.bolos.mare.model.Item;
+import com.yuri.development.bolos.mare.model.ItemInProduct;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,5 +22,5 @@ public class ProductDTO {
     @NotNull
     private BigDecimal price;
 
-    private List<Item> items;
+    private List<ItemInProduct> itemsList;
 }

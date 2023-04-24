@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,11 +20,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    private final ItemInProductService itemInProductService;
+
     @Autowired
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ItemInProductService itemInProductService) {
         this.productRepository = productRepository;
+        this.itemInProductService = itemInProductService;
     }
 
+    @Transactional
     public ResponseEntity<?> save(ProductCreateDTO productDTO) {
 
         Optional<Product> optProduct = productRepository.findByName(productDTO.getName());
@@ -35,8 +38,12 @@ public class ProductService {
 
         Product product = new Product();
         adaptToProduct(product, productDTO);
+        productRepository.save(product);
 
-        product = productRepository.save(product);
+        productDTO.getItemsList().forEach(item -> item.setProduct(product));
+        product.setItemsList(productDTO.getItemsList());
+
+        productRepository.save(product);
 
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
@@ -49,16 +56,23 @@ public class ProductService {
             return new ResponseEntity<>(ErrorConstants.RESOURCE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        adaptToProduct(optProduct.get(), productCreateDTO);
-        productRepository.save(optProduct.get());
+        Product product = optProduct.get();
 
-        return new ResponseEntity<>(optProduct.get(), HttpStatus.OK);
+        adaptToProduct(product, productCreateDTO);
+        itemInProductService.deleteByProduct(product);
+        productRepository.save(product);
+
+        productCreateDTO.getItemsList().forEach(item -> item.setProduct(product));
+        product.setItemsList(productCreateDTO.getItemsList());
+        productRepository.save(product);
+
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     public ResponseEntity<?> findAll() {
 
         List<Product> productList = productRepository.findAll();
-        List<ProductDTO> productDTOList = new ArrayList<>();
+        List<ProductDTO> productDTOList;
 
         productDTOList = productList.stream()
                 .map(this::adaptProductToDTO).collect(Collectors.toList());
@@ -80,8 +94,7 @@ public class ProductService {
 
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
-        product.setItemsList(dto.getItemsList());
-
+        product.setItemsList(null);
     }
 
     private ProductDTO adaptProductToDTO(Product product){
@@ -90,7 +103,7 @@ public class ProductService {
         productDTO.setId(product.getId());
         productDTO.setName(product.getName());
         productDTO.setPrice(product.getPrice());
-        productDTO.setItems(product.getItemsList());
+        productDTO.setItemsList(product.getItemsList());
 
         return  productDTO;
     }

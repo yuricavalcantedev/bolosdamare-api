@@ -35,8 +35,8 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @CrossOrigin(origins = {"http://localhost:4200"})
-    public void delete(@PathVariable Long id) {
-        productService.delete(id);
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        return productService.delete(id);
     }
 
 }

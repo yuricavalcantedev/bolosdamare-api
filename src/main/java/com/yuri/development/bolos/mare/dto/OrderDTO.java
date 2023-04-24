@@ -1,7 +1,7 @@
 package com.yuri.development.bolos.mare.dto;
 
+import com.yuri.development.bolos.mare.enums.EOrderStatus;
 import com.yuri.development.bolos.mare.model.Product;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,14 +12,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderCreateDTO {
+public class OrderDTO {
 
     private Long id;
-
-    private BigDecimal totalAmount;
-
     private String note;
-
-    @NotEmpty
+    private EOrderStatus status;
+    private BigDecimal totalAmount;
     private List<Product> productList;
 }

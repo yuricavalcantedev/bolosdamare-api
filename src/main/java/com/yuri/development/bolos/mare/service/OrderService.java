@@ -1,6 +1,8 @@
 package com.yuri.development.bolos.mare.service;
 
 import com.yuri.development.bolos.mare.dto.OrderCreateDTO;
+import com.yuri.development.bolos.mare.dto.OrderDTO;
+import com.yuri.development.bolos.mare.dto.ProductDTO;
 import com.yuri.development.bolos.mare.model.Order;
 import com.yuri.development.bolos.mare.repository.OrderRepository;
 import com.yuri.development.bolos.mare.util.ErrorConstants;
@@ -9,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -34,8 +38,14 @@ public class OrderService {
         return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> findaAll(){
-        return new ResponseEntity<>(orderRepository.findAll(), HttpStatus.OK);
+    public ResponseEntity<?> findAll(){
+
+        List<Order> orderList = orderRepository.findAll();
+        List<OrderDTO> orderDTOList;
+
+        orderDTOList = orderList.stream()
+                .map(this::adaptOrderToDto).collect(Collectors.toList());
+        return new ResponseEntity<>(orderDTOList, HttpStatus.OK);
     }
 
     public ResponseEntity<?> update(){
@@ -57,5 +67,18 @@ public class OrderService {
 
         order.setNote(orderCreateDTO.getNote());
         order.setProductsList(orderCreateDTO.getProductList());
+    }
+
+    private OrderDTO adaptOrderToDto(Order order){
+
+        OrderDTO orderDTO = new OrderDTO();
+
+        orderDTO.setId(order.getId());
+        orderDTO.setNote(order.getNote());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setTotalAmount(order.getTotalAmount());
+        orderDTO.setProductList(order.getProductsList());
+
+        return orderDTO;
     }
 }

@@ -21,11 +21,10 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private EOrderStatus eOrderStatus;
+    private EOrderStatus status;
 
     private LocalDateTime createdDate;
 
@@ -47,7 +46,7 @@ public class Order {
 
         this.createdDate = LocalDateTime.now(ZoneOffset.UTC);
         this.updatedDate = LocalDateTime.now(ZoneOffset.UTC);
-        this.eOrderStatus = EOrderStatus.CREATED;
+        this.status = EOrderStatus.CREATED;
 
         totalAmount = productsList.stream()
                                   .map(Product::getPrice)
@@ -56,11 +55,8 @@ public class Order {
 
     @PreUpdate
     public void preUpdate(){
+
         this.updatedDate = LocalDateTime.now(ZoneOffset.UTC);
-
-        List<BigDecimal> sumOfProductAmount = productsList.stream()
-                .map(Product::getPrice).toList();
-
         totalAmount = productsList.stream()
                                   .map(Product::getPrice)
                                   .reduce(BigDecimal.ZERO, BigDecimal::add);

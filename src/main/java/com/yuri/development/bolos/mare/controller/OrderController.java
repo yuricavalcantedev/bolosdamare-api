@@ -25,7 +25,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<?> findAll(){
-        return orderService.findaAll();
+        return orderService.findAll();
     }
 
     public ResponseEntity<?> update(){

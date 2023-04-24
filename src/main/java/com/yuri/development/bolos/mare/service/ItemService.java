@@ -29,7 +29,7 @@ public class ItemService {
         }
 
         Item item = adaptItemDTOToItem(itemDTO);
-        item = itemRepository.save(item);
+        itemRepository.save(item);
 
         return new ResponseEntity<>(item, HttpStatus.CREATED);
     }
@@ -43,7 +43,7 @@ public class ItemService {
 
         Item item = adaptItemDTOToItem(itemDTO);
         item.setId(itemId);
-        item = itemRepository.save(item);
+        itemRepository.save(item);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
